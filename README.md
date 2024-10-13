@@ -13,7 +13,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Lakshyakumar266/JEE-DPP-Manager.git
+   git clone https://github.com/Lakshyakumar266/JEE-DPP-Manager-App.git
    cd dpp-manager
 
 2. **Install dependencies:** 
