@@ -1,50 +1,76 @@
-# Welcome to your Expo app 👋
+# DPP Manager
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**DPP Manager** is a React Native application designed to manage and display DPP's (Daily Practice Problem) paper images for students. The app allows users to view different subjects access their corresponding Dpp's, and explore images related to each DPP's.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Subject List**: Display a list of Chemistry subjects, each containing multiple DPP's.
+- **DPP's Details**: View detailed information for each DPP's, including associated images.
+- **Image Viewer**: Tap on images to view them in full-screen mode.
+- **Add DPP's**: A placeholder feature to add new DPP's (currently just logs to the console).
 
+## Installation
+
+1. **Clone the repository**:
    ```bash
-   npm install
-   ```
+   git clone https://github.com/yourusername/dpp-manager.git
+   cd dpp-manager
 
-2. Start the app
+2. **Install dependencies:** 
+    Make sure you have Node.js and Expo CLI installed. Then run:
 
-   ```bash
+    ```bash
+    npm install
+
+3. **Run the app:** Use Expo to start the development server:
+
+    ```bash
     npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+## Usage
+- Launch the app on your mobile device or emulator.
+- Navigate through the list of Chemistry subjects.
+- Tap on a subject to view its DPP.
+- Tap on a DPP to view its images and then tap on any image to see it in full screen.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Technologies Used
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- #### React Native
+- #### Expo
+- #### JavaScript
+- #### React Hooks
 
-## Get a fresh project
+## Assets
 
-When you're ready, run:
+This project includes sample images located in the `assets/images` directory. You can replace them with your own images as needed.
 
-```bash
-npm run reset-project
-```
+## Contributing
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request.
 
-## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## License
 
-## Join the community
+[MIT](https://choosealicense.com/licenses/mit/)
 
-Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Acknowledgements
+
+Thanks to the `React Native` and `Expo` communities for their support and documentation.
+
+
+### Instructions:
+- **Update the Repository URL**: Replace `https://github.com/yourusername/dpp-manager.git` with the actual link to your repository.
+- **Modify Features**: If there are more specific features you want to highlight, feel free to add or change them.
+- **Add Images**: Consider adding a section for screenshots if you have them.
+
+Let me know if you need further adjustments or any additional information!
+
+## 🔗 Links
+[![portfolio](https://img.shields.io/badge/github-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lakshyakumar266)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lakshya-kumar-3387021b8/)
+[![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/CodingProGamer)
+
+
+![Logo](https://yt3.googleusercontent.com/wsoXNpcVspo-HEdGS7V_ccC00XhgJuU2a8u4nG2VY0HNZhpfnfQPaZ2ekSY7ZymmGK_kfCsM6Q=s160-c-k-c0x00ffffff-no-rj) 
