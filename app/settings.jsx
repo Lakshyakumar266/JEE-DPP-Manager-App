@@ -44,7 +44,7 @@ const Settings = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.option}
-                onPress={() => router.push('/about')}>
+                onPress={() => router.push('/profile')}>
                 <MaterialIcons name="info" size={24} color="#2b2d42" />
                 <Text style={styles.optionText}>About</Text>
             </TouchableOpacity>
