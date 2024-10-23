@@ -9,6 +9,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
     const icons = {
         index: (props) => <AntDesign name="home" size={26} color={primaryColor} {...props} />,
         profile: (props) => <AntDesign name="user" size={26} color={primaryColor} {...props} />,
+        upload: (props) => <AntDesign name="pluscircleo" size={32} color={primaryColor} {...props} />,
         cdps: (props) => <MaterialCommunityIcons name="file-document-outline" size={26} color={primaryColor} {...props} />,
         settings: (props) => <Ionicons name="settings-outline" size={26} color={primaryColor} {...props} />
     }
@@ -62,12 +63,15 @@ const TabBar = ({ state, descriptors, navigation }) => {
                                 color: isFocused ? primaryColor : activeColor
                             })
                         }
-                        <Text style={{
-                            color: isFocused ? primaryColor : activeColor,
-                            fontSize: 10
-                        }}>
-                            {label}
-                        </Text>
+                        {
+                            label === '' ? '' :
+                                (<Text style={{
+                                    color: isFocused ? primaryColor : activeColor,
+                                    fontSize: 10
+                                }}>
+                                    {label}
+                                </Text>)
+                        }
                     </TouchableOpacity>
                 );
             })}
@@ -82,7 +86,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent white for glass effect
+        backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi-transparent white for glass effect
         backdropFilter: 'blur(10px)', // Blur effect (might not work in React Native directly)
         marginHorizontal: 10,
         paddingVertical: 10,

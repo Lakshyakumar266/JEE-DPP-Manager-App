@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./AppIcons/android/mipmap-xxxhdpi/ic_launcher.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.codingprogamer.CDPSManager"
@@ -25,10 +25,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./AppIcons/playstore.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      ["expo-image-picker",   
+      {
+        "photosPermission": "Allow this app to access your photos."
+      }]
     ],
     "experiments": {
       "typedRoutes": true

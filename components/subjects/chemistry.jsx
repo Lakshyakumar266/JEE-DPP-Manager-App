@@ -1,112 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Image, TouchableWithoutFeedback } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
-import { MaterialIcons } from '@expo/vector-icons';
-
-// Sample data for subjects and their corresponding CDPS
-const subjects = [
-  {
-    id: 1,
-    title: 'Organic Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-          require('../../assets/images/icon.png'),
-        ],
-      },
-      {
-        id: 2,
-        name: 'CDPS 2',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-          require('../../assets/images/adaptive-icon.png'),
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'Inorganic Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/partial-react-logo.png'),
-        ],
-      },
-      {
-        id: 2,
-        name: 'CDPS 2',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: 'Physical Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/splash.png'),
-          require('../../assets/images/star-161984_1280.jpg'),
-        ],
-      },
-    ],
-  },
-];
+import { firebase } from '../../config';
 
 const Chemistry = () => {
-  const [selectedCDP, setSelectedCDP] = useState(null); // To track the selected CDPS
-  const [selectedImage, setSelectedImage] = useState(null); // To track the full-screen image
+  const [CDPS, setCDPS] = useState([]);
+  const [selectedCDP, setSelectedCDP] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleCDPPress = (cdp) => {
-    setSelectedCDP(cdp); // Show all images for the selected CDPS
+    setSelectedCDP(cdp);
   };
 
   const handleImagePress = (image) => {
-    setSelectedImage(image); // Show the clicked image in full-screen
+    setSelectedImage(image);
   };
 
   const handleCloseImage = () => {
-    setSelectedImage(null); // Close the full-screen image modal
+    setSelectedImage(null);
   };
 
   const handleCloseCDPModal = () => {
-    setSelectedCDP(null); // Close the CDPS images modal
+    setSelectedCDP(null);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      firebase
+        .database()
+        .ref('subjects')
+        .on('value', (snapshot) => {
+          const subjectsData = snapshot.val()['Chemistry'];
+          if (subjectsData) {
+            const fetchedCDPS = Object.keys(subjectsData).map((key, index) => {
+              const subject = subjectsData[key];
+              return {
+                id: index + 1,
+                title: subject.title,
+                cdpList: subject.cdpList.map((cdp, cdpIndex) => ({
+                  id: cdpIndex + 1,
+                  name: cdp.name,
+                  images: cdp.images.map((imageUrl) => {
+                    return { uri: imageUrl };
+                  }),
+                })),
+              };
+            });
+            setCDPS(fetchedCDPS);
+          }
+        });
+    };
+    fetchData();
+    return () => firebase.database().ref('subjects').off();
+  }, []);
 
   return (
     <View style={styles.container}>
-
-      <View style={styles.topBar}>
-        <TouchableOpacity style={styles.addButton} onPress={() => console.log('Add CDPS pressed')}>
-          <MaterialIcons name="add-a-photo" style={styles.addButtonText} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
       <Text style={styles.header}>Chemistry CDPS</Text>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Subject List */}
-        {subjects.map((subject) => (
+        {CDPS.map((subject) => (
           <View key={subject.id} style={styles.subjectContainer}>
             <Text style={styles.subjectTitle}>{subject.title}</Text>
-
-            {/* CDPS List for the subject */}
             {subject.cdpList.map((cdp) => (
-              <TouchableOpacity
-                key={cdp.id}
-                style={styles.cdpButton}
-                onPress={() => handleCDPPress(cdp)}
-              >
+              <TouchableOpacity key={cdp.id} style={styles.cdpButton} onPress={() => handleCDPPress(cdp)}>
                 <Text style={styles.cdpName}>{cdp.name}</Text>
               </TouchableOpacity>
             ))}
@@ -114,7 +71,6 @@ const Chemistry = () => {
         ))}
       </ScrollView>
 
-      {/* Modal for showing all images of selected CDPS */}
       {selectedCDP && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseCDPModal}>
           <TouchableWithoutFeedback onPress={handleCloseCDPModal}>
@@ -139,7 +95,6 @@ const Chemistry = () => {
         </Modal>
       )}
 
-      {/* Full-screen image modal */}
       {selectedImage && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseImage}>
           <TouchableWithoutFeedback onPress={handleCloseImage}>
@@ -160,21 +115,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#edf2f4', // Match HomePage background
     paddingHorizontal: 20,
     paddingVertical: 10,
-  },
-  topBar: {
-    position: 'absolute',
-    right: 10,
-    bottom: 80,
-  },
-  addButton: {
-    backgroundColor: '#800080',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 50,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 25,
   },
   header: {
     fontSize: 24,
@@ -210,7 +150,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.90)',
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',

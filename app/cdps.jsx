@@ -11,6 +11,7 @@ const CDPS = () => {
     // const { subject } = router.query; // Extracting the 'subject' parameter
     const { subject } = useLocalSearchParams();
     console.log(subject);
+    
 
     if (subject === 'Physics') {
         return (<Physics/>)

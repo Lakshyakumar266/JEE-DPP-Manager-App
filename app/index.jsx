@@ -4,8 +4,8 @@ import { useRouter } from 'expo-router';
 
 const HomePage = () => {
   const router = useRouter();
-  
-  
+
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 5,
+    elevation: 1,
   },
   cardImage: {
     width: 60,

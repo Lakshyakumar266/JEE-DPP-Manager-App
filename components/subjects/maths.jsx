@@ -1,72 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Image, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  Image,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
-import { MaterialIcons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system'; // Import expo-file-system
 
-
-// Sample data for subjects and their corresponding CDPS
-const subjects = [
-  {
-    id: 1,
-    title: 'Organic Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-          require('../../assets/images/icon.png'),
-        ],
-      },
-      {
-        id: 2,
-        name: 'CDPS 2',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-          require('../../assets/images/adaptive-icon.png'),
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'Inorganic Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/partial-react-logo.png'),
-        ],
-      },
-      {
-        id: 2,
-        name: 'CDPS 2',
-        images: [
-          require('../../assets/images/star-161984_1280.jpg'),
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: 'Physical Chemistry',
-    cdpList: [
-      {
-        id: 1,
-        name: 'CDPS 1',
-        images: [
-          require('../../assets/images/splash.png'),
-          require('../../assets/images/star-161984_1280.jpg'),
-        ],
-      },
-    ],
-  },
-];
+import { firebase } from '../../config'; // Make sure firebase is properly initialized in your project
 
 const Maths = () => {
-  const [selectedCDP, setSelectedCDP] = useState(null); // To track the selected CDPS
-  const [selectedImage, setSelectedImage] = useState(null); // To track the full-screen image
+  const [CDPS, setCDPS] = useState([]); // State to store fetched CDPS
+  const [selectedCDP, setSelectedCDP] = useState(null); // State to track selected CDPS
+  const [selectedImage, setSelectedImage] = useState(null); // State to track the full-screen image
+  const [loading, setLoading] = useState(true); // State to handle loading
+
+  // Fetch data from Firebase on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true); // Set loading to true when fetching data
+      firebase
+        .database()
+        .ref('subjects')
+        .on('value', (snapshot) => {
+          const subjectsData = snapshot.val()['Mathematics'];
+          if (subjectsData) {
+            const fetchedCDPS = Object.keys(subjectsData).map((key, index) => {
+              const subject = subjectsData[key];
+              return {
+                id: index + 1,
+                title: subject.title,
+                cdpList: subject.cdpList.map((cdp, cdpIndex) => ({
+                  id: cdpIndex + 1,
+                  name: cdp.name,
+                  images: cdp.images.map((imageUrl) => {
+                    return { uri: imageUrl };
+                  }),
+                })),
+              };
+            });
+            setCDPS(fetchedCDPS); // Set the data in the state
+            setLoading(false); // Set loading to false once data is loaded
+          }
+        });
+    };
+
+    fetchData();
+    return () => firebase.database().ref('subjects').off();
+  }, []);
 
   const handleCDPPress = (cdp) => {
     setSelectedCDP(cdp); // Show all images for the selected CDPS
@@ -84,38 +72,63 @@ const Maths = () => {
     setSelectedCDP(null); // Close the CDPS images modal
   };
 
+  // Function to download all images of selected CDPS
+  const downloadCDPSImages = async () => {
+    if (!selectedCDP) return;
+
+    const downloadPromises = selectedCDP.images.map(async (image) => {
+      const uri = image.uri;
+      const fileUri = FileSystem.documentDirectory + uri.split('/').pop(); // Generate a file name based on the image URL
+
+      try {
+        // Set the directory path inside the app's document directory
+        const directoryUri = `${FileSystem.documentDirectory}CDPS_Manager/`;
+        await FileSystem.makeDirectoryAsync(directoryUri, { intermediates: true });
+    
+        // Define the file name (you can customize this as needed)
+        const fileName = `cdps_${new Date().getTime()}.jpeg`; // example filename with timestamp
+        const fileUri = `${directoryUri}${fileName}`;
+    
+        // Start the download
+        const { uri: localUri } = await FileSystem.downloadAsync(uri, fileUri);
+        console.log('Finished downloading to ', localUri);
+        
+        // Optionally show a success message here
+      } catch (error) {
+        console.error('Error downloading file:', error);
+      }
+    
+    });
+
+    await Promise.all(downloadPromises);
+    Alert.alert('Success', 'All images downloaded successfully!');
+  };
+
   return (
     <View style={styles.container}>
-
-      <View style={styles.topBar}>
-        <TouchableOpacity style={styles.addButton} onPress={() => console.log('Add CDPS pressed')}>
-          <MaterialIcons name="add-a-photo" style={styles.addButtonText} color="black" />
-        </TouchableOpacity>
-      </View>
-
       <Text style={styles.header}>Mathematics CDPS</Text>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Subject List */}
-        {subjects.map((subject) => (
-          <View key={subject.id} style={styles.subjectContainer}>
-            <Text style={styles.subjectTitle}>{subject.title}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#2b2d42" />
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {CDPS.map((subject) => (
+            <View key={subject.id} style={styles.subjectContainer}>
+              <Text style={styles.subjectTitle}>{subject.title}</Text>
+              {subject.cdpList.map((cdp) => (
+                <TouchableOpacity
+                  key={cdp.id}
+                  style={styles.cdpButton}
+                  onPress={() => handleCDPPress(cdp)}
+                >
+                  <Text style={styles.cdpName}>{cdp.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+      )}
 
-            {/* CDPS List for the subject */}
-            {subject.cdpList.map((cdp) => (
-              <TouchableOpacity
-                key={cdp.id}
-                style={styles.cdpButton}
-                onPress={() => handleCDPPress(cdp)}
-              >
-                <Text style={styles.cdpName}>{cdp.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </ScrollView>
-
-      {/* Modal for showing all images of selected CDPS */}
       {selectedCDP && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseCDPModal}>
           <TouchableWithoutFeedback onPress={handleCloseCDPModal}>
@@ -133,6 +146,9 @@ const Maths = () => {
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
+                  <TouchableOpacity style={styles.downloadButton} onPress={downloadCDPSImages}>
+                    <Text style={styles.downloadButtonText}>Download All Images</Text>
+                  </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
             </View>
@@ -140,8 +156,6 @@ const Maths = () => {
         </Modal>
       )}
 
-
-      {/* Full-screen image modal */}
       {selectedImage && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseImage}>
           <TouchableWithoutFeedback onPress={handleCloseImage}>
@@ -155,34 +169,18 @@ const Maths = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     flex: 1,
-    backgroundColor: '#edf2f4', // Match HomePage background
+    backgroundColor: '#edf2f4',
     paddingHorizontal: 20,
     paddingVertical: 10,
-  },
-  topBar: {
-    position: 'absolute',
-    right: 10,
-    bottom: 80,
-  },
-  addButton: {
-    backgroundColor: '#800080',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 50,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 25,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2b2d42', // Match HomePage header color
+    color: '#2b2d42',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
   },
   subjectTitle: {
     fontSize: 20,
-    color: '#2b2d42', // Match HomePage subject color
+    color: '#2b2d42',
     marginBottom: 10,
   },
   cdpButton: {
@@ -209,7 +207,7 @@ const styles = StyleSheet.create({
   },
   cdpName: {
     fontSize: 16,
-    color: '#2b2d42', // Match HomePage CDPS color
+    color: '#2b2d42',
   },
   modalContainer: {
     flex: 1,
@@ -245,6 +243,17 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 10,
+  },
+  downloadButton: {
+    backgroundColor: '#2b2d42',
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 20,
+  },
+  downloadButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
   fullScreenImageContainer: {
     flex: 1,

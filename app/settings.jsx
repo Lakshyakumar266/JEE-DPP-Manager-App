@@ -42,7 +42,6 @@ const Settings = () => {
                 <MaterialIcons name="help" size={24} color="#2b2d42" />
                 <Text style={styles.optionText}>Help</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.option}
                 onPress={() => router.push('/profile')}>
                 <MaterialIcons name="info" size={24} color="#2b2d42" />
