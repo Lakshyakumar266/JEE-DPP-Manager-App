@@ -59,14 +59,6 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 
 Thanks to the `React Native` and `Expo` communities for their support and documentation.
 
-
-### Instructions:
-- **Update the Repository URL**: Replace `https://github.com/yourusername/dpp-manager.git` with the actual link to your repository.
-- **Modify Features**: If there are more specific features you want to highlight, feel free to add or change them.
-- **Add Images**: Consider adding a section for screenshots if you have them.
-
-Let me know if you need further adjustments or any additional information!
-
 ## 🔗 Links
 [![portfolio](https://img.shields.io/badge/github-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lakshyakumar266)
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lakshya-kumar-3387021b8/)

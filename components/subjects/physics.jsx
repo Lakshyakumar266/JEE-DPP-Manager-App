@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Image, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 
-import { firebase } from '../../config';
+import { supabase } from '../../lib/supabase';
 
 const Physics = () => {
   const [CDPS, setCDPS] = useState([]);
@@ -29,43 +29,34 @@ const Physics = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Set loading to true when fetching data
-      firebase
-        .database()
-        .ref('subjects')
-        .on('value', (snapshot) => {
-          const subjectsData = snapshot.val()['Physics'];
-          if (subjectsData) {
-            // Map the data to the desired format
-            const fetchedCDPS = Object.keys(subjectsData).map((key, index) => {
-              const subject = subjectsData[key];
-              return {
-                id: index + 1, // Provide an incremented ID
-                title: subject.title,
-                cdpList: subject.cdpList.map((cdp, cdpIndex) => ({
-                  id: cdpIndex + 1, // Provide an incremented ID for each CDPS
-                  name: cdp.name,
-                  images: cdp.images.map((imageUrl) => {
-                    // You need to handle images carefully depending on how they are stored
-                    return { uri: imageUrl }; // Assuming images are URLs from Firebase
-                  }),
-                })),
-              };
-            });
-            setCDPS(fetchedCDPS); // Set the data in the state
-            setLoading(false); // Set loading to false once data is loaded
-          }
-        });
+
+      const { data, error } = await supabase
+        .from('subjects')
+        .select('title, cdpList')
+        .eq('subject', 'Physics');
+
+      if (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+        return;
+      }
+
+      const fetchedCDPS = data.map((subject, index) => ({
+        id: index + 1, // Provide an incremented ID
+        title: subject.title,
+        cdpList: subject.cdpList.map((cdp, cdpIndex) => ({
+          id: cdpIndex + 1, // Provide an incremented ID for each CDPS
+          name: cdp.name,
+          images: cdp.images.map((imageUrl) => ({ uri: imageUrl })), // Assuming images are URLs
+        })),
+      }));
+
+      setCDPS(fetchedCDPS); // Set the data in the state
+      setLoading(false); // Set loading to false once data is loaded
     };
 
     fetchData();
-
-    // Clean up the Firebase listener when the component unmounts
-    return () => firebase.database().ref('subjects').off();
   }, []);
-
-  const handleImageLoaded = () => {
-    setLoading(false); // Set loading to false when images have loaded
-  };
 
   if (loading) {
     // Show a loading spinner while data is loading
@@ -82,12 +73,10 @@ const Physics = () => {
       <Text style={styles.header}>Physics CDPS</Text>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Subject List */}
         {CDPS.map((subject) => (
           <View key={subject.id} style={styles.subjectContainer}>
             <Text style={styles.subjectTitle}>{subject.title}</Text>
 
-            {/* CDPS List for the subject */}
             {subject.cdpList.map((cdp) => (
               <TouchableOpacity
                 key={cdp.id}
@@ -101,7 +90,6 @@ const Physics = () => {
         ))}
       </ScrollView>
 
-      {/* Modal for showing all images of selected CDPS */}
       {selectedCDP && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseCDPModal}>
           <TouchableWithoutFeedback onPress={handleCloseCDPModal}>
@@ -115,7 +103,7 @@ const Physics = () => {
                   <ScrollView contentContainerStyle={styles.imagesGrid}>
                     {selectedCDP.images.map((image, index) => (
                       <TouchableOpacity key={index} onPress={() => handleImagePress(image)}>
-                        <Image source={image} style={styles.cdpImageThumbnail} onLoad={handleImageLoaded} />
+                        <Image source={image} style={styles.cdpImageThumbnail} />
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
@@ -126,7 +114,6 @@ const Physics = () => {
         </Modal>
       )}
 
-      {/* Full-screen image modal */}
       {selectedImage && (
         <Modal visible={true} transparent={true} onRequestClose={handleCloseImage}>
           <TouchableWithoutFeedback onPress={handleCloseImage}>
@@ -144,14 +131,14 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     flex: 1,
-    backgroundColor: '#edf2f4', // Match HomePage background
+    backgroundColor: '#edf2f4',
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2b2d42', // Match HomePage header color
+    color: '#2b2d42',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -163,7 +150,7 @@ const styles = StyleSheet.create({
   },
   subjectTitle: {
     fontSize: 20,
-    color: '#2b2d42', // Match HomePage subject color
+    color: '#2b2d42',
     marginBottom: 10,
   },
   cdpButton: {
@@ -178,7 +165,7 @@ const styles = StyleSheet.create({
   },
   cdpName: {
     fontSize: 16,
-    color: '#2b2d42', // Match HomePage CDPS color
+    color: '#2b2d42',
   },
   modalContainer: {
     flex: 1,

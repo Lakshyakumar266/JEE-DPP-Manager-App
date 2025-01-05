@@ -3,6 +3,7 @@ import React from 'react';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 const Profile = () => {
+    console.log('Profile page');
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>

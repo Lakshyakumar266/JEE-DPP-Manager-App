@@ -16,6 +16,10 @@
       "supportsTablet": true
     },
     "android": {
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "INTERNET"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./AppIcons/android/mipmap-xxxhdpi/ic_launcher.png",
         "backgroundColor": "#ffffff"
